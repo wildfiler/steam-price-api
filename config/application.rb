@@ -31,4 +31,6 @@ module SteamPriceApi
   end
 end
 
-Spring.watch "app/**"
+if defined?(Spring)
+  Spring.watch "app/**"
+end
