@@ -7,6 +7,7 @@ require 'spec_helper'
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 require 'webmock/rspec'
+require 'sidekiq/testing'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -52,6 +53,22 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  config.before(:each) do |example|
+    # Clears out the jobs for tests using the fake testing
+    Sidekiq::Worker.clear_all
+
+    # Get the current example from the example_method object
+    if example.metadata[:sidekiq] == :fake
+      Sidekiq::Testing.fake!
+    elsif example.metadata[:sidekiq] == :inline
+      Sidekiq::Testing.inline!
+    elsif example.metadata[:type] == :acceptance
+      Sidekiq::Testing.inline!
+    else
+      Sidekiq::Testing.fake!
+    end
+  end
 end
 
 ActiveJob::Base.queue_adapter = :test

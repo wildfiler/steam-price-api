@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe SteamMarketPriceImportJob, type: :job do
+describe SteamMarketPriceImportJob, type: :job, sidekiq: :inline do
   it 'creates SteamMarketItemPrice' do
     app_id = 730
     item_name = 'Some Item'
@@ -12,7 +12,7 @@ describe SteamMarketPriceImportJob, type: :job do
     code = 200
 
     expect do
-      SteamMarketPriceImportJob.perform_now(app_id, item_name, response, code)
+      SteamMarketPriceImportJob.perform_async(app_id, item_name, response, code)
     end.to change(SteamMarketItemPrice, :count).by 1
 
     price = SteamMarketItemPrice.last
@@ -33,7 +33,7 @@ describe SteamMarketPriceImportJob, type: :job do
       code = 500
 
       expect do
-        SteamMarketPriceImportJob.perform_now(app_id, item_name, response, code)
+        SteamMarketPriceImportJob.perform_async(app_id, item_name, response, code)
       end.not_to change(SteamMarketItemPrice, :count)
     end
   end

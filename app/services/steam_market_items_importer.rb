@@ -29,7 +29,12 @@ class SteamMarketItemsImporter
       query[:start] += 100
       response = nil
       20.times do
-        sleep 5 rsed_response = response.parsed_response
+        response = HTTParty.get('http://steamcommunity.com/market/search/render/', query: query)
+        break if response
+        sleep 5
+      end
+
+      parsed_response = response.parsed_response
 
       item_names = @parser.parse(parsed_response['results_html'])
 
@@ -40,7 +45,7 @@ class SteamMarketItemsImporter
 
   end
 
-  class SteamMarketItemsImporter::Parser
+  class Parser
     def parse(html)
       page = Nokogiri::HTML(html)
       page.css('.market_listing_item_name').map(&:text)

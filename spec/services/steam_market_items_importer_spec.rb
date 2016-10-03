@@ -18,7 +18,7 @@ describe SteamMarketItemsImporter do
     items = (0...100).map { |n| "Item #{n}" }
 
     items.each_slice(20) do |items20|
-      expect(SteamMarketPriceFetchJob).to receive(:perform_later).
+      expect(SteamMarketPriceFetchJob).to receive(:perform_async).
         with(app_id.to_s, items20).at_least(3).times.and_call_original
     end
 
@@ -48,7 +48,7 @@ describe SteamMarketItemsImporter do
     expect(parser).to have_received(:parse).with(JSON.parse(body)['results_html']).exactly(3).times
 
 
-    expect(SteamMarketPriceFetchJob).to have_been_enqueued.on_queue('fetch').exactly(15).times
+    expect(SteamMarketPriceFetchJob.jobs.size).to eq 15
   end
 end
 
