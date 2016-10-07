@@ -1,7 +1,8 @@
 class SteamMarketItemsImporter
 
-  def initialize(app_id)
+  def initialize(app_id, parser: SteamMarketItemsImporter::Parser.new)
     @app_id = app_id
+    @parser = parser
   end
 
   def import
@@ -17,10 +18,12 @@ class SteamMarketItemsImporter
     response = do_request(query)
 
     total_count = response['total_count']
-    (total_count/100.0).ceil.times do
-      SteamMarketItemsFetchJob.perform_async(@app_id.to_s, query[:start].to_s)
+    ((total_count - 100)/100.0).ceil.times do
       query[:start] += 100
+      SteamMarketItemsFetchJob.perform_async(@app_id.to_s, query[:start].to_s)
     end
+
+    parse_first_page(response)
   end
 
   def do_request(query)
@@ -31,5 +34,23 @@ class SteamMarketItemsImporter
       sleep 5
     end
     response.parsed_response
+  end
+
+  def parse_first_page(response)
+    item_names = @parser.parse(response['results_html'])
+    item_names.each do |item|
+      begin
+        SteamMarketItem.find_or_create_by(app_id: @app_id, name: item)
+      rescue ActiveRecord::RecordNotUnique
+        retry
+      end
+    end
+  end
+
+  class Parser
+    def parse(html)
+      page = Nokogiri::HTML(html)
+      page.css('.market_listing_item_name').map(&:text)
+    end
   end
 end
