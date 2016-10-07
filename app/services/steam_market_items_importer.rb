@@ -6,15 +6,15 @@ class SteamMarketItemsImporter
 
   def import
     query = {
-        start: 0,
-        count: 100,
-        search_descriptions: 0,
-        sort_column: 'name',
-        sort_dir: 'asc',
-        appid: @app_id
+      start: 0,
+      count: 100,
+      search_descriptions: 0,
+      sort_column: 'name',
+      sort_dir: 'asc',
+      appid: @app_id
     }
 
-    response = do_response(query)
+    response = do_request(query)
 
     total_count = response['total_count']
     (total_count/100.0).ceil.times do
@@ -23,7 +23,7 @@ class SteamMarketItemsImporter
     end
   end
 
-  def do_response(query)
+  def do_request(query)
     response = nil
     10.times do
       response = HTTParty.get('http://steamcommunity.com/market/search/render/', query: query)
