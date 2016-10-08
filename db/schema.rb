@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 20161005180514) do
     t.integer  "app_id",     null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["app_id", "name"], name: "index_steam_market_items_on_app_id_and_name", unique: true, using: :btree
     t.index ["name"], name: "index_steam_market_items_on_name", using: :btree
   end
 

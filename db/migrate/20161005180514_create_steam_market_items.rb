@@ -5,6 +5,7 @@ class CreateSteamMarketItems < ActiveRecord::Migration[5.0]
       t.integer :app_id, null: false
 
       t.timestamps null: false
+      t.index [:app_id, :name], unique: true
     end
   end
 end
