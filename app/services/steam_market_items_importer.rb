@@ -38,13 +38,7 @@ class SteamMarketItemsImporter
 
   def parse_first_page(response)
     item_names = @parser.parse(response['results_html'])
-    item_names.each do |item|
-      begin
-        SteamMarketItem.find_or_create_by(app_id: @app_id, name: item)
-      rescue ActiveRecord::RecordNotUnique
-        retry
-      end
-    end
+    SteamMarketItemsImportJob.perform_async(@app_id.to_s, item_names)
   end
 
   class Parser
