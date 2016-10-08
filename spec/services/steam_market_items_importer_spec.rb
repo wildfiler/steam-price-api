@@ -15,9 +15,9 @@ describe SteamMarketItemsImporter do
 
     body = File.read(Rails.root.join('spec', 'fixtures', 'items_list_page_0.html'))
 
-    3.times do |start|
+    2.times do |start|
       expect(SteamMarketItemsFetchJob).to receive(:perform_async).
-        with(app_id.to_s, (start * 100).to_s).and_call_original
+        with(app_id.to_s, ((start + 1) * 100).to_s).and_call_original
     end
 
     stub_request(:get, "http://steamcommunity.com/market/search/render/").
@@ -29,6 +29,6 @@ describe SteamMarketItemsImporter do
     expect(WebMock).to have_requested(:get, 'http://steamcommunity.com/market/search/render/').
       with(query: query)
 
-    expect(SteamMarketItemsFetchJob.jobs.size).to eq 3
+    expect(SteamMarketItemsFetchJob.jobs.size).to eq 2
   end
 end
