@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161002135609) do
+ActiveRecord::Schema.define(version: 20161005180514) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,6 +29,15 @@ ActiveRecord::Schema.define(version: 20161002135609) do
     t.index ["app_id", "name"], name: "index_steam_market_item_prices_on_app_id_and_name", using: :btree
     t.index ["app_id"], name: "index_steam_market_item_prices_on_app_id", using: :btree
     t.index ["name"], name: "index_steam_market_item_prices_on_name", using: :btree
+  end
+
+  create_table "steam_market_items", force: :cascade do |t|
+    t.text     "name",       null: false
+    t.integer  "app_id",     null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_id", "name"], name: "index_steam_market_items_on_app_id_and_name", unique: true, using: :btree
+    t.index ["name"], name: "index_steam_market_items_on_name", using: :btree
   end
 
 end

@@ -14,35 +14,31 @@ class SteamMarketItemsImporter
       sort_dir: 'asc',
       appid: @app_id
     }
-    response = HTTParty.get('http://steamcommunity.com/market/search/render/', query: query)
-    parsed_response = response.parsed_response
 
-    item_names = @parser.parse(parsed_response['results_html'])
+    response = do_request(query)
 
-    item_names.each_slice(20) do |items|
-      SteamMarketPriceFetchJob.perform_async(@app_id.to_s, items)
-    end
-
-    total_count = parsed_response['total_count']
-
+    total_count = response['total_count']
     ((total_count - 100)/100.0).ceil.times do
       query[:start] += 100
-      response = nil
-      20.times do
-        response = HTTParty.get('http://steamcommunity.com/market/search/render/', query: query)
-        break if response
-        sleep 5
-      end
-
-      parsed_response = response.parsed_response
-
-      item_names = @parser.parse(parsed_response['results_html'])
-
-      item_names.each_slice(20) do |items|
-        SteamMarketPriceFetchJob.perform_async(@app_id.to_s, items)
-      end
+      SteamMarketItemsFetchJob.perform_async(@app_id.to_s, query[:start].to_s)
     end
 
+    parse_first_page(response)
+  end
+
+  def do_request(query)
+    response = nil
+    10.times do
+      response = HTTParty.get('http://steamcommunity.com/market/search/render/', query: query)
+      break if response.present?
+      sleep 5
+    end
+    response.parsed_response
+  end
+
+  def parse_first_page(response)
+    item_names = @parser.parse(response['results_html'])
+    SteamMarketItemsImportJob.perform_async(@app_id.to_s, item_names)
   end
 
   class Parser
