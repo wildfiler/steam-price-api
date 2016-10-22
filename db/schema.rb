@@ -10,10 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161008132325) do
+ActiveRecord::Schema.define(version: 20161014145307) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "steam_market_item_history_prices", force: :cascade do |t|
+    t.integer  "app_id",          null: false
+    t.integer  "item_id",         null: false
+    t.integer  "total_amount"
+    t.float    "all_time_median"
+    t.integer  "last_30_amount"
+    t.float    "last_30_median"
+    t.integer  "last_7_amount"
+    t.float    "last_7_median"
+    t.integer  "last_24h_amount"
+    t.float    "last_24h_median"
+    t.datetime "fetched_at"
+    t.datetime "updated_at",      null: false
+    t.index ["app_id", "item_id"], name: "index_steam_market_item_history_prices_on_app_id_and_item_id", unique: true, using: :btree
+    t.index ["item_id"], name: "index_steam_market_item_history_prices_on_item_id", using: :btree
+  end
 
   create_table "steam_market_item_prices", force: :cascade do |t|
     t.string   "name",                    null: false
