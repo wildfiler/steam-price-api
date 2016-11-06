@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161008132325) do
+ActiveRecord::Schema.define(version: 20161106155803) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,6 +39,17 @@ ActiveRecord::Schema.define(version: 20161008132325) do
     t.string   "item_nameid"
     t.index ["app_id", "name"], name: "index_steam_market_items_on_app_id_and_name", unique: true, using: :btree
     t.index ["name"], name: "index_steam_market_items_on_name", using: :btree
+  end
+
+  create_table "steam_market_orders_details", force: :cascade do |t|
+    t.string   "item_nameid",                        null: false
+    t.decimal  "highest_buy_order",  default: "0.0"
+    t.decimal  "lowest_sell_order",  default: "0.0"
+    t.integer  "buy_order_summary",  default: 0
+    t.integer  "sell_order_summary", default: 0
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.index ["item_nameid"], name: "index_steam_market_orders_details_on_item_nameid", using: :btree
   end
 
 end
