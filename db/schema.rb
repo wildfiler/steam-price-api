@@ -42,13 +42,13 @@ ActiveRecord::Schema.define(version: 20161106155803) do
   end
 
   create_table "steam_market_orders_details", force: :cascade do |t|
-    t.string   "item_nameid",                      null: false
-    t.float    "highest_buy_order",  default: 0.0
-    t.float    "lowest_sell_order",  default: 0.0
-    t.integer  "buy_order_summary",  default: 0
-    t.integer  "sell_order_summary", default: 0
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.string   "item_nameid",                     null: false
+    t.float    "highest_buy_order", default: 0.0, null: false
+    t.float    "lowest_sell_order", default: 0.0, null: false
+    t.integer  "buy_order_number",  default: 0,   null: false
+    t.integer  "sell_order_number", default: 0,   null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
     t.index ["item_nameid"], name: "index_steam_market_orders_details_on_item_nameid", using: :btree
   end
 
